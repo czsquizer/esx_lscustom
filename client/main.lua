@@ -462,10 +462,34 @@ Citizen.CreateThread(function()
 	end
 end)
 
+local waitTime = 500
+local nearestCoords
+
+Citizen.CreateThread(function()
+
+    while true do
+        Wait(500)
+        if nearestCoords then
+            local ped = PlayerPedId()
+            local pedCoords = GetEntityCoords(ped)
+            if #(pedCoords - nearestCoords) > 20.5 then
+                nearestCoords = nil
+                waitTime = 500
+            else
+                Wait(500)
+            end
+        else
+            Wait(500)
+        end
+    end
+
+
+end)
+
 -- Activate menu when player is inside marker
 Citizen.CreateThread(function()
 	while true do
-		Citizen.Wait(0)
+		Citizen.Wait(waitTime)
 		local playerPed = PlayerPedId()
 
 		if IsPedInAnyVehicle(playerPed, false) then
@@ -476,6 +500,10 @@ Citizen.CreateThread(function()
 				for k,v in pairs(Config.Zones) do
 					if GetDistanceBetweenCoords(coords, v.Pos.x, v.Pos.y, v.Pos.z, true) < v.Size.x and not lsMenuIsShowed then
 						isInLSMarker  = true
+						if not nearestCoords then
+							waitTime = 0
+							nearestCoords = vector3(v.Pos.x, v.Pos.y, v.Pos.z)
+						end
 						ESX.ShowHelpNotification(v.Hint)
 						break
 					else
