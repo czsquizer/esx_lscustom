@@ -39,6 +39,7 @@ AddEventHandler('esx_lscustom:installMod', function()
 	local vehicle = GetVehiclePedIsIn(PlayerPedId(), false)
 	myCar = ESX.Game.GetVehicleProperties(vehicle)
 	TriggerServerEvent('esx_lscustom:refreshOwnedVehicle', myCar)
+	TriggerServerEvent('esx_lscustom:UpdateTunnedVehicles', myCar, vehicle)
 end)
 
 RegisterNetEvent('esx_lscustom:cancelInstallMod')
@@ -47,7 +48,9 @@ AddEventHandler('esx_lscustom:cancelInstallMod', function()
 	if (GetPedInVehicleSeat(vehicle, -1) ~= PlayerPedId()) then
 		 vehicle = GetPlayersLastVehicle(PlayerPedId())
 	end
-		ESX.Game.SetVehicleProperties(vehicle, myCar)
+
+	TriggerServerEvent('esx_lscustom:TunningDone')
+	ESX.Game.SetVehicleProperties(vehicle, myCar)
 	if not (myCar.modTurbo) then
 		ToggleVehicleMod(vehicle,  18, false)
 	end
@@ -228,6 +231,7 @@ function UpdateMods(data)
 
 		props[data.modType] = data.modNum
 		ESX.Game.SetVehicleProperties(vehicle, props)
+		TriggerServerEvent('esx_lscustom:UpdateTunnedVehicles', myCar, vehicle)
 	end
 end
 
@@ -490,7 +494,7 @@ Citizen.CreateThread(function()
 					FreezeEntityPosition(vehicle, true)
 
 					myCar = ESX.Game.GetVehicleProperties(vehicle)
-
+					TriggerServerEvent('esx_lscustom:UpdateTunnedVehicles', myCar, vehicle)
 					ESX.UI.Menu.CloseAll()
 					GetAction({value = 'main'})
 				end

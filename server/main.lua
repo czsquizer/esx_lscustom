@@ -1,4 +1,5 @@
 ESX = nil
+local playerTunning = {}
 local Vehicles
 
 TriggerEvent('esx:getSharedObject', function(obj) ESX = obj end)
@@ -34,6 +35,41 @@ AddEventHandler('esx_lscustom:buyMod', function(price)
 			TriggerClientEvent('esx:showNotification', _source, _U('not_enough_money'))
 		end
 	end
+end)
+
+RegisterNetEvent('esx_lscustom:UpdateTunnedVehicles')
+AddEventHandler('esx_lscustom:UpdateTunnedVehicles', function(props, vehicle)
+	local _source = source
+
+	playerTunning[_source] = {
+		vehicleProps = props,
+		vehicleId = vehicle
+	}
+
+end)
+
+RegisterNetEvent('esx_lscustom:TunningDone')
+AddEventHandler('esx_lscustom:TunningDone', function()
+	local _source = source
+
+	if playerTunning[_source] then
+		playerTunning[_source] = nil
+	end
+
+end)
+
+AddEventHandler('playerDropped', function (reason)
+	local _source = source
+
+	if playerTunning[_source] then
+		if DoesEntityExist(playerTunning[_source].vehicleId) then
+			if NetworkGetEntityOwner(playerTunning[_source].vehicleId) > 0 then
+				TriggerClientEvent('esx_lscustom:revertVehicleProperties', NetworkGetEntityOwner(playerTunning[_source].vehicleId), playerTunning[_source].vehicleProps)
+			end
+		end
+		playerTunning[_source] = nil
+	end
+
 end)
 
 RegisterServerEvent('esx_lscustom:refreshOwnedVehicle')
