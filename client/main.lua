@@ -4,6 +4,8 @@ local PlayerData = {}
 local lsMenuIsShowed = false
 local isInLSMarker = false
 local myCar = {}
+local isTunning = false
+local lastVehicle
 
 Citizen.CreateThread(function()
 	while ESX == nil do
@@ -55,6 +57,73 @@ AddEventHandler('esx_lscustom:cancelInstallMod', function()
 	if not (myCar.windowTint) then
 		SetVehicleWindowTint(vehicle, 0)
 	end
+end)
+
+Citizen.CreateThread(function()
+
+	while true do
+		Wait(0)
+		if isTunning then
+			local ped = PlayerPedId()
+			if IsPedInAnyVehicle(ped) then
+				local pedVeh = GetVehiclePedIsIn(ped,false)
+				if pedVeh ~= 0 then
+					if lastVehicle ~= pedVeh then
+						ESX.Game.SetVehicleProperties(lastVehicle, myCar)
+						if not (myCar.modTurbo) then
+							ToggleVehicleMod(lastVehicle,  18, false)
+						end
+						if not (myCar.modXenon) then
+							ToggleVehicleMod(lastVehicle,  22, false)
+						end
+						if not (myCar.windowTint) then
+							SetVehicleWindowTint(lastVehicle, 0)
+						end
+						lastVehicle = nil
+						myCar = {}
+						lsMenuIsShowed = false
+						FreezeEntityPosition(lastVehicle, false)
+						isTunning = false
+					end
+				else
+					ESX.Game.SetVehicleProperties(lastVehicle, myCar)
+					if not (myCar.modTurbo) then
+						ToggleVehicleMod(lastVehicle,  18, false)
+					end
+					if not (myCar.modXenon) then
+						ToggleVehicleMod(lastVehicle,  22, false)
+					end
+					if not (myCar.windowTint) then
+						SetVehicleWindowTint(lastVehicle, 0)
+					end
+					lastVehicle = nil
+					myCar = {}
+					lsMenuIsShowed = false
+					FreezeEntityPosition(lastVehicle, false)
+					isTunning = false
+				end
+			else
+				ESX.Game.SetVehicleProperties(lastVehicle, myCar)
+				if not (myCar.modTurbo) then
+					ToggleVehicleMod(lastVehicle,  18, false)
+				end
+				if not (myCar.modXenon) then
+					ToggleVehicleMod(lastVehicle,  22, false)
+				end
+				if not (myCar.windowTint) then
+					SetVehicleWindowTint(lastVehicle, 0)
+				end
+				lastVehicle = nil
+				myCar = {}
+				lsMenuIsShowed = false
+				FreezeEntityPosition(lastVehicle, false)
+				isTunning = false
+			end
+		else
+			Wait(500)
+		end
+	end
+
 end)
 
 function OpenLSMenu(elems, menuName, menuTitle, parent)
@@ -124,6 +193,7 @@ function OpenLSMenu(elems, menuName, menuTitle, parent)
 		if parent == nil then
 			lsMenuIsShowed = false
 			local vehicle = GetVehiclePedIsIn(PlayerPedId(), false)
+			isTunning = false
 			FreezeEntityPosition(vehicle, false)
 			myCar = {}
 		end
@@ -415,6 +485,8 @@ Citizen.CreateThread(function()
 					lsMenuIsShowed = true
 
 					local vehicle = GetVehiclePedIsIn(playerPed, false)
+					lastVehicle = vehicle
+					isTunning = true
 					FreezeEntityPosition(vehicle, true)
 
 					myCar = ESX.Game.GetVehicleProperties(vehicle)
