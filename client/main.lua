@@ -196,6 +196,7 @@ function OpenLSMenu(elems, menuName, menuTitle, parent)
 		if parent == nil then
 			lsMenuIsShowed = false
 			local vehicle = GetVehiclePedIsIn(PlayerPedId(), false)
+			TriggerServerEvent('esx_lscustom:TunningDone')
 			isTunning = false
 			FreezeEntityPosition(vehicle, false)
 			myCar = {}
