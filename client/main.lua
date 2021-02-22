@@ -447,6 +447,13 @@ function GetAction(data)
 	OpenLSMenu(elements, menuName, menuTitle, parent)
 end
 
+RegisterNetEvent('revertVehicleProperties')
+AddEventHandler('revertVehicleProperties', function(vehicle, props)
+
+	ESX.Game.SetVehicleProperties(vehicle, props)
+
+end)
+
 -- Blips
 Citizen.CreateThread(function()
 	for k,v in pairs(Config.Zones) do
