@@ -448,8 +448,8 @@ function GetAction(data)
 	OpenLSMenu(elements, menuName, menuTitle, parent)
 end
 
-RegisterNetEvent('revertVehicleProperties')
-AddEventHandler('revertVehicleProperties', function(vehicle, props)
+RegisterNetEvent('esx_lscustom:revertVehicleProperties')
+AddEventHandler('esx_lscustom:revertVehicleProperties', function(vehicle, props)
 
 	ESX.Game.SetVehicleProperties(vehicle, props)
 
